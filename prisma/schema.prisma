@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Expert {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  email       String @unique
+  name        String
+  institution String
+
+  entries Entry[]
+}
+
+model Entry {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  meta      Json?
+
+  prompt            String
+  rationale         String
+  veredict          String
+  critique          String?
+  promptImprovement String?
+
+  // model
+  modelId       String
+  modelResponse String
+
+  // author
+  author   Expert @relation(fields: [authorId], references: [id])
+  authorId Int
+}

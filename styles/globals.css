@@ -92,3 +92,83 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/** ME **/
+
+.example-textarea {
+  font-size: 14px;
+  min-height: 20lh;
+}
+
+ol,
+ul,
+menu {
+  list-style: initial;
+  margin: initial;
+  padding: 0 0 0 32px;
+}
+
+.instructions-panel h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--primary-purple);
+  margin-bottom: 0.2em;
+  margin-top: 16px;
+}
+
+.button.selected {
+  border: 3px solid white;
+}
+
+i {
+  color: var(--text-secondary);
+}
+
+.response-container h3 {
+  margin-bottom: 6px;
+  color: var(--button-blue);
+}
+
+.next-steps-container h3 {
+  margin-top: 0;
+  margin-bottom: 6px;
+  color: var(--primary-purple);
+}
+
+.response-textarea {
+  field-sizing: content;
+  font-family: monospace;
+  min-height: 10lh;
+  font-size: 14px;
+}
+
+.response-box {
+  width: 100%;
+  padding: 12px 15px;
+  border-radius: 8px;
+  background-color: var(--input-bg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 16px;
+  font-family: inherit;
+  box-sizing: border-box;
+  white-space: pre-wrap;
+  /* font-family: serif; */
+}
+
+.response-box .MathJax {
+  font-size: 1.1rem;
+}
+
+.response-box-toggle {
+  color: var(--primary-purple);
+  text-decoration: underline;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 20px;
+  display: inline;
+  font-size: 0.8rem;
+  margin: 0px 1ch;
+}

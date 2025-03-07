@@ -1,10 +1,12 @@
+"use client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { BarChart3, CheckCircle, Clock } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 // Mock data for problems
-const problems = [
+const tasks = [
   {
     id: 1,
     title: "API Integration Issue",
@@ -36,12 +38,10 @@ const problems = [
 ];
 
 export default function DashboardPage() {
-  // Calculate statistics
-  const totalProblems = problems.length;
-  const resolvedProblems = problems.filter(
-    (p) => p.status === "Resolved"
-  ).length;
-  const totalHours = problems.reduce((sum, p) => sum + p.hoursLogged, 0);
+  const router = useRouter();
+  const totalProblems = tasks.length;
+  const resolvedProblems = tasks.filter((p) => p.status === "Resolved").length;
+  const totalHours = tasks.reduce((sum, p) => sum + p.hoursLogged, 0);
   const avgHoursPerProblem =
     totalProblems > 0 ? (totalHours / totalProblems).toFixed(1) : "0";
 
@@ -64,7 +64,7 @@ export default function DashboardPage() {
             >
               <path d="m15 18-6-6 6-6" />
             </svg>
-            Work App
+            Logout
           </Link>
           <div className="ml-auto flex items-center gap-2">
             <Button variant="outline" size="icon">
@@ -166,7 +166,13 @@ export default function DashboardPage() {
         <div className="mt-8">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-xl font-semibold">Your Problems</h2>
-            <Button className="bg-blue-600 hover:bg-blue-700">
+            <Button
+              className="bg-blue-600 hover:bg-blue-700"
+              onClick={() => {
+                console.log("HELLo");
+                router.push("/task");
+              }}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -200,32 +206,32 @@ export default function DashboardPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {problems.map((problem) => (
-                    <tr key={problem.id} className="hover:bg-gray-50">
+                  {tasks.map((task) => (
+                    <tr key={task.id} className="hover:bg-gray-50">
                       <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
-                        #{problem.id}
+                        #{task.id}
                       </td>
                       <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">
-                        {problem.title}
+                        {task.title}
                       </td>
                       <td className="whitespace-nowrap px-6 py-4 text-sm">
                         <span
                           className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                            problem.status === "Open"
+                            task.status === "Open"
                               ? "bg-yellow-100 text-yellow-800"
-                              : problem.status === "In Progress"
+                              : task.status === "In Progress"
                               ? "bg-blue-100 text-blue-800"
                               : "bg-green-100 text-green-800"
                           }`}
                         >
-                          {problem.status}
+                          {task.status}
                         </span>
                       </td>
                       <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                        {problem.dateCreated}
+                        {task.dateCreated}
                       </td>
                       <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                        {problem.hoursLogged} hrs
+                        {task.hoursLogged} hrs
                       </td>
                       <td className="whitespace-nowrap px-6 py-4 text-sm">
                         <div className="flex space-x-2">
