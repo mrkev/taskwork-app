@@ -10,11 +10,12 @@ export async function askAI(prompt: string) {
   return response;
 }
 
-type TaskData = {
+export type TaskData = {
   authorId: number;
   prompt: string;
   veredict: string;
   critique?: string;
+  correctSolution?: string;
   promptImprovement?: string;
   modelName: string;
   modelResponse: string;
@@ -30,7 +31,7 @@ export async function submitTask(data: TaskData) {
       prompt: data.prompt,
       veredict: data.veredict,
       critique: data.critique,
-
+      correctSolution: data.correctSolution,
       promptImprovement: data.promptImprovement,
 
       // model

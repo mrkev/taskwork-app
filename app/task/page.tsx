@@ -9,7 +9,7 @@ import { nullthrows } from "@/components/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { askAI, submitTask } from "./actions";
+import { askAI, submitTask, TaskData } from "./actions";
 import { FORMID } from "./formIds";
 
 type ResponseGrade = "correct" | "unsatisfactory" | "incorrect";
@@ -82,7 +82,7 @@ export default function TaskingPage() {
     }
 
     const formData = new FormData(e.currentTarget);
-    const data = {
+    const data: TaskData = {
       authorId: login.expert.id,
       prompt: formString(formData, "PROMPT") as string,
       // response
@@ -93,6 +93,11 @@ export default function TaskingPage() {
       veredict: formString(formData, "GRADE") as string,
       critique:
         (formOptString(formData, "CRITIQUE") as string | null) ?? undefined,
+
+      correctSolution:
+        (formOptString(formData, "CORRECT_SOLUTION") as string | null) ??
+        undefined,
+
       promptImprovement: formOptString(formData, "PROMPT_IMPROVEMENT"),
     };
 
@@ -334,6 +339,20 @@ function NextStepsImprovable({ grade }: { grade: ResponseGrade }) {
             id={FORMID.CRITIQUE}
             name={FORMID.CRITIQUE}
             placeholder="Explain where and why the model's response was incorrect, inaccurate, or inadequate, including cases where it was error-free but unsatisfactory for your research needs."
+            className="min-h-[150px] w-full"
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          {/* TODO: label for */}
+          <h4 className="text-md font-medium text-gray-700">
+            What is the correct solution for this problem?*
+          </h4>
+          <Textarea
+            id={FORMID.CORRECT_SOLUTION}
+            name={FORMID.CORRECT_SOLUTION}
+            placeholder="Write the correct solution..."
             className="min-h-[150px] w-full"
             required
           />

@@ -26,9 +26,13 @@ model Task {
   updatedAt DateTime @updatedAt
   meta      Json?
 
-  prompt            String
-  veredict          String
-  critique          String?
+  prompt   String
+  veredict String
+
+  critique        String?
+  correctSolution String?
+
+  // if correct
   promptImprovement String?
 
   // model
