@@ -1,44 +1,47 @@
 "use server";
-import { askGrokGen } from "../../components/ai";
-import { nullthrows } from "../../components/utils";
+import { askGrok0217, askGrok3, askGrokKYI } from "../../components/ai";
+import prisma from "../../lib/prisma";
+// import type { Prisma } from "@prisma/client";
 
 export async function askAI(prompt: string) {
   const response = await askGrok0217(prompt).catch(() =>
-    askGrok(prompt).catch(() => askGrok3(prompt))
+    askGrokKYI(prompt).catch(() => askGrok3(prompt))
   );
   return response;
 }
 
-export type ModelResponse = {
+type TaskData = {
+  prompt: string;
+  rationale: string;
+  veredict: string;
+  critique?: string;
+  promptImprovement?: string;
   modelName: string;
-  response: string;
+  modelResponse: string;
 };
 
-async function askGrok(prompt: string): Promise<ModelResponse> {
-  const response = await askGrokGen(prompt, "kyi-grok-0202-a");
+export async function submitTask(data: TaskData) {
+  console.log("Submitting task data:", data);
 
-  const fixed = nullthrows(response, "no response 2");
-  return {
-    modelName: "kyi-grok-0202-a",
-    response: fixed,
-  };
-}
+  const result = await prisma.entry.create({
+    data: {
+      authorId: 0, // todo
 
-async function askGrok3(prompt: string): Promise<ModelResponse> {
-  const response = await askGrokGen(prompt, "grok-3-latest");
-  const fixed = nullthrows(response, "no response 2");
-  return {
-    modelName: "grok-3-latest",
-    response: fixed,
-  };
-}
+      prompt: data.prompt,
+      rationale: data.rationale,
+      veredict: data.veredict,
+      critique: data.critique,
 
-async function askGrok0217(prompt: string): Promise<ModelResponse> {
-  const response = await askGrokGen(prompt, "research-grok-0217");
+      promptImprovement: data.promptImprovement,
 
-  const fixed = nullthrows(response, "no response 2");
-  return {
-    modelName: "research-grok-0217",
-    response: fixed,
-  };
+      // model
+      modelName: data.modelName, // todo
+      modelResponse: data.modelResponse,
+    },
+  });
+
+  console.log("submitted", data);
+
+  // For now, we'll just return a success message
+  return { success: true, message: "Challenge submitted successfully" };
 }

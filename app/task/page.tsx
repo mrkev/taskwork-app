@@ -1,5 +1,6 @@
 "use client";
 
+import { ModelResponse } from "@/components/ai";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -7,18 +8,17 @@ import { PlusCircle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { askAI, ModelResponse } from "./actions";
+import { askAI } from "./actions";
+import { FORMID } from "./formIds";
 
 type ResponseGrade = "correct" | "unsatisfactory" | "incorrect";
 
 export default function TaskingPage() {
   const router = useRouter();
   const [prompt, setPrompt] = useState("write eulers identity in latex");
-  // const [reasoning, setReasoning] = useState("It's hard because it's math");
   const [showPlaintext, setShowPlaintext] = useState(false);
   const [grade, setGrade] = useState<ResponseGrade | null>(null);
-  const [complexityIncrease, setComplexityIncrease] = useState("");
-  const [critique, setCritique] = useState("");
+
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<ModelResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -46,131 +46,39 @@ export default function TaskingPage() {
     setGrade(type);
   };
 
-  const isFormValid = () => {
-    // Basic validation: problem and reasoning must be filled
-    if (!prompt.trim() || grade == null) {
-      return false;
-    }
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // TODO: ensure response generated, grade set
+    // if (!isFormValid()) {
+    //   alert("Please fill out all required fields before submitting.");
+    //   return;
+    // }
 
-    // If feedback is unsatisfactory or incorrect, critique must be filled
-    if (
-      (grade === "unsatisfactory" || grade === "incorrect") &&
-      !critique.trim()
-    ) {
-      return false;
-    }
+    const formData = new FormData(e.currentTarget);
+    const data = {
+      prompt: (formData.get(FORMID.PROMPT) ?? "") as string,
+      // response
+      modelResponse: (formData.get(FORMID.MODEL_RESPONSE) ?? "") as string,
 
-    return true;
-  };
-
-  const handleSubmit = () => {
-    if (!isFormValid()) {
-      alert("Please fill out all required fields before submitting.");
-      return;
-    }
-
-    // Collect all form data
-    const formData = {
-      problem: prompt,
-      // reasoning,
-      feedback: grade,
-      ...(grade === "correct" && { complexityIncrease }),
-      ...(grade === "unsatisfactory" || grade === "incorrect"
-        ? { critique }
-        : {}),
+      // review
+      veredict: (formData.get(FORMID.GRADE) ?? "") as string,
+      critique: (formData.get(FORMID.CRITIQUE) as string | null) ?? undefined,
+      promptImprovement:
+        (formData.get(FORMID.PROMPT_IMPROVEMENT) as string | null) ?? undefined,
     };
 
     // Log the form data
-    console.log("Form submitted with data:", formData);
+    console.log("Form submitted with data:", data);
 
     // Redirect to dashboard
     router.push("/dashboard");
-  };
-
-  const renderNextSteps = () => {
-    if (grade === "correct") {
-      return (
-        <Card className="mb-6">
-          <CardContent className="p-6 space-y-6">
-            <div>
-              <h3 className="text-lg font-medium text-primary mb-2">
-                Next Steps:
-              </h3>
-              <p className="text-gray-700">
-                If you had to make this problem more complicated for LLMs, in a
-                way you could still solve it yourself (with or without model
-                assistance) how would you do it?
-              </p>
-              <p className="text-sm text-gray-500 mt-2">
-                Note: You don&apos;t need to modify your question at this time.
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <h4 className="text-md font-medium text-gray-700">
-                Increase Challenge Complexity (Optional)
-              </h4>
-              <Textarea
-                placeholder="How would you modify this question to make it even more challenging for the AI?"
-                className="min-h-[150px] w-full"
-                value={complexityIncrease}
-                onChange={(e) => setComplexityIncrease(e.target.value)}
-              />
-            </div>
-
-            <Button
-              variant="outline"
-              className="flex items-center gap-2 text-primary hover:bg-primary/10"
-            >
-              <PlusCircle className="h-4 w-4" />
-              Add Another Challenge
-            </Button>
-          </CardContent>
-        </Card>
-      );
-    }
-
-    if (grade === "unsatisfactory" || grade === "incorrect") {
-      return (
-        <Card className="mb-6">
-          <CardContent className="p-6 space-y-6">
-            <div>
-              <h3 className="text-lg font-medium text-primary mb-2">
-                Next Steps:
-              </h3>
-              <p className="text-gray-700">
-                You&apos;ve indicated that the model&apos;s response was {grade}
-                . Please provide your critique to help us understand where the
-                model failed:
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <h4 className="text-md font-medium text-gray-700">
-                Your Critique: Where and why did the model&apos;s response
-                fail?*
-              </h4>
-              <Textarea
-                placeholder="Explain where and why the model's response was incorrect, inaccurate, or inadequate, including cases where it was error-free but unsatisfactory for your research needs."
-                className="min-h-[150px] w-full"
-                value={critique}
-                onChange={(e) => setCritique(e.target.value)}
-                required={grade === "unsatisfactory" || grade === "incorrect"}
-              />
-            </div>
-          </CardContent>
-        </Card>
-      );
-    }
-
-    return null;
   };
 
   const hasResponse = response && !loading;
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 pb-20">
-      <div className="mx-auto max-w-4xl">
+      <form className="mx-auto max-w-4xl" onSubmit={handleSubmit}>
         <header className="mb-6 flex items-center">
           <Link href="/dashboard" className="flex items-center text-gray-500">
             <svg
@@ -198,7 +106,7 @@ export default function TaskingPage() {
           <CardContent className="space-y-6">
             <div className="space-y-2">
               <label htmlFor="problem" className="block text-sm font-medium">
-                Your Research Problem*
+                Write a Problem*
               </label>
               <Textarea
                 id="problem"
@@ -233,41 +141,27 @@ export default function TaskingPage() {
                   <h3 className="text-lg font-medium">
                     Model&apos;s Response:
                   </h3>
-                  <div className="flex gap-2 text-sm">
-                    <button className="text-primary hover:underline">
+                  {/* <div className="flex gap-2 text-sm">
+                    <button
+                      type="button"
+                      className="text-primary hover:underline"
+                    >
                       autofix LaTeX
                     </button>
                     <button
+                      type="button"
                       className="text-primary hover:underline"
                       onClick={() => setShowPlaintext(!showPlaintext)}
                     >
                       {showPlaintext ? "hide plaintext" : "show plaintext"}
                     </button>
-                  </div>
+                  </div> */}
                 </div>
 
                 <Card className="bg-gray-50">
                   <CardContent className="p-4">
-                    <p className="mb-4">
-                      Euler&apos;s identity in LaTeX can be written as:
-                    </p>
-
-                    {showPlaintext ? (
-                      <pre className="mb-4 rounded bg-gray-100 p-3 font-mono text-sm">{`e^{i\\pi} + 1 = 0`}</pre>
-                    ) : null}
-
-                    <p className="mb-4">
-                      When rendered, it will display as:{" "}
-                      <span className="font-serif italic">
-                        e<sup>iπ</sup> + 1 = 0
-                      </span>
-                      , which is considered one of the most beautiful equations
-                      in mathematics, connecting five fundamental mathematical
-                      constants: <span className="italic">e</span> (the base of
-                      natural logarithms), <span className="italic">i</span>{" "}
-                      (the imaginary unit), <span className="italic">π</span>{" "}
-                      (pi), 1, and 0.
-                    </p>
+                    {/* TODO RESPONSE BOX */}
+                    {response.response}
                   </CardContent>
                 </Card>
 
@@ -278,7 +172,9 @@ export default function TaskingPage() {
                     className={`border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700 ${
                       grade === "correct" ? "bg-green-50" : ""
                     }`}
-                    onClick={() => handleFeedbackClick("correct")}
+                    onClick={() => {
+                      handleFeedbackClick("correct");
+                    }}
                   >
                     Correct
                   </Button>
@@ -306,22 +202,92 @@ export default function TaskingPage() {
           </CardContent>
         </Card>
 
-        {renderNextSteps()}
+        {grade === "correct" ? (
+          <NextStepsCorrect />
+        ) : grade === "unsatisfactory" || grade === "incorrect" ? (
+          <NextStepsImprovable grade={grade} />
+        ) : null}
 
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 shadow-md">
           <div className="mx-auto max-w-4xl flex justify-end">
-            <Button
-              onClick={handleSubmit}
-              className="bg-primary hover:bg-primary/90"
-              disabled={!isFormValid()}
-            >
+            <Button type="submit" className="bg-primary hover:bg-primary/90">
               Submit
             </Button>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 }
 
-function AskSection() {}
+function NextStepsCorrect() {
+  return (
+    <Card className="mb-6">
+      <CardContent className="p-6 space-y-6">
+        <div>
+          <h3 className="text-lg font-medium text-primary mb-2">Next Steps:</h3>
+          <p className="text-gray-700">
+            If you had to make this problem more complicated for LLMs, in a way
+            you could still solve it yourself (with or without model assistance)
+            how would you do it?
+          </p>
+          <p className="text-sm text-gray-500 mt-2">
+            Note: You don&apos;t need to modify your question at this time.
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          {/* TODO label for */}
+          <h4 className="text-md font-medium text-gray-700">
+            Increase Challenge Complexity (Optional)
+          </h4>
+          <Textarea
+            id={FORMID.PROMPT_IMPROVEMENT}
+            name={FORMID.PROMPT_IMPROVEMENT}
+            placeholder="How would you modify this question to make it even more challenging for the AI?"
+            className="min-h-[150px] w-full"
+          />
+        </div>
+
+        {/* <Button
+          variant="outline"
+          className="flex items-center gap-2 text-primary hover:bg-primary/10"
+        >
+          <PlusCircle className="h-4 w-4" />
+          Add Another Challenge
+        </Button> */}
+      </CardContent>
+    </Card>
+  );
+}
+
+function NextStepsImprovable({ grade }: { grade: ResponseGrade }) {
+  return (
+    <Card className="mb-6">
+      <CardContent className="p-6 space-y-6">
+        <div>
+          <h3 className="text-lg font-medium text-primary mb-2">Next Steps:</h3>
+          <p className="text-gray-700">
+            You&apos;ve indicated that the model&apos;s response was {grade}.
+            Please provide your critique to help us understand where the model
+            failed:
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          {/* TODO: label for */}
+          <h4 className="text-md font-medium text-gray-700">
+            Your Critique: Where and why did the model&apos;s response fail?*
+          </h4>
+          <Textarea
+            id={FORMID.CRITIQUE}
+            name={FORMID.CRITIQUE}
+            placeholder="Explain where and why the model's response was incorrect, inaccurate, or inadequate, including cases where it was error-free but unsatisfactory for your research needs."
+            className="min-h-[150px] w-full"
+            required
+          />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

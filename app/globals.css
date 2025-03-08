@@ -81,7 +81,7 @@
 .loader {
   width: 2rem;
   height: 2rem;
-  border: 5px solid #fff;
+  border: 5px solid hsl(var(--primary));
   border-bottom-color: transparent;
   border-radius: 50%;
   display: inline-block;

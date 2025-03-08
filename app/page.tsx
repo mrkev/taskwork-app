@@ -1,26 +1,33 @@
-import { redirect } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { redirect } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { handleLogin } from "./handleLogin";
 
 export default function LoginPage() {
-  async function handleLogin(formData: FormData) {
-    "use server"
+  // async function handleLogin(formData: FormData) {
+  //   "use server";
 
-    // In a real app, you would validate the email
-    // For demo purposes, we'll just redirect to the dashboard
-    const email = formData.get("email") as string
+  //   // In a real app, you would validate the email
+  //   // For demo purposes, we'll just redirect to the dashboard
+  //   const email = formData.get("email") as string;
 
-    if (email) {
-      redirect("/dashboard")
-    }
-  }
+  //   const login = await doLogin({ email });
+
+  //   if (login.status === "ok") {
+  //     // Store user info in localStorage for simplicity
+  //     localStorage.setItem("login", JSON.stringify(login));
+  //     redirect("/dashboard");
+  //   }
+  // }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-2xl text-center">Problem Management App</CardTitle>
+          <CardTitle className="text-2xl text-center">
+            Problem Management App
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <form action={handleLogin} className="space-y-4">
@@ -28,7 +35,14 @@ export default function LoginPage() {
               <label htmlFor="email" className="text-sm font-medium">
                 Email
               </label>
-              <Input id="email" name="email" type="email" placeholder="Enter your email" required className="w-full" />
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="Enter your email"
+                required
+                className="w-full"
+              />
             </div>
             <Button type="submit" className="w-full">
               Sign In
@@ -37,6 +51,5 @@ export default function LoginPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
-
