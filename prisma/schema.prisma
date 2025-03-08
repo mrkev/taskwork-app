@@ -27,7 +27,6 @@ model Entry {
   meta      Json?
 
   prompt            String
-  rationale         String
   veredict          String
   critique          String?
   promptImprovement String?

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { BarChart3, CheckCircle, Clock } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useLogin } from "@/components/useLogin";
 
 // Mock data for problems
 const tasks = [
@@ -44,6 +45,8 @@ export default function DashboardPage() {
   const totalHours = tasks.reduce((sum, p) => sum + p.hoursLogged, 0);
   const avgHoursPerProblem =
     totalProblems > 0 ? (totalHours / totalProblems).toFixed(1) : "0";
+
+  const user = useLogin();
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">

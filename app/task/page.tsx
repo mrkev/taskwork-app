@@ -8,16 +8,30 @@ import { PlusCircle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { askAI } from "./actions";
+import { askAI, submitTask } from "./actions";
 import { FORMID } from "./formIds";
+import { useLogin } from "@/components/useLogin";
+import { nullthrows } from "@/components/utils";
 
 type ResponseGrade = "correct" | "unsatisfactory" | "incorrect";
+
+function formString(formData: FormData, name: keyof typeof FORMID): string {
+  return nullthrows(formData.get(FORMID[name]), "missing " + name) as string;
+}
+
+function formOptString(
+  formData: FormData,
+  name: keyof typeof FORMID
+): string | undefined {
+  return (formData.get(FORMID[name]) ?? undefined) as string | undefined;
+}
 
 export default function TaskingPage() {
   const router = useRouter();
   const [prompt, setPrompt] = useState("write eulers identity in latex");
   const [showPlaintext, setShowPlaintext] = useState(false);
   const [grade, setGrade] = useState<ResponseGrade | null>(null);
+  const user = useLogin();
 
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<ModelResponse | null>(null);
@@ -46,7 +60,7 @@ export default function TaskingPage() {
     setGrade(type);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // TODO: ensure response generated, grade set
     // if (!isFormValid()) {
@@ -56,16 +70,20 @@ export default function TaskingPage() {
 
     const formData = new FormData(e.currentTarget);
     const data = {
-      prompt: (formData.get(FORMID.PROMPT) ?? "") as string,
+      authorId: user.expert.id,
+      prompt: formString(formData, "PROMPT") as string,
       // response
-      modelResponse: (formData.get(FORMID.MODEL_RESPONSE) ?? "") as string,
+      modelResponse: formString(formData, "MODEL_RESPONSE") as string,
+      modelName: formString(formData, "MODEL_RESPONSE") as string,
 
       // review
-      veredict: (formData.get(FORMID.GRADE) ?? "") as string,
-      critique: (formData.get(FORMID.CRITIQUE) as string | null) ?? undefined,
-      promptImprovement:
-        (formData.get(FORMID.PROMPT_IMPROVEMENT) as string | null) ?? undefined,
+      veredict: formString(formData, "GRADE") as string,
+      critique:
+        (formOptString(formData, "CRITIQUE") as string | null) ?? undefined,
+      promptImprovement: formOptString(formData, "PROMPT_IMPROVEMENT"),
     };
+
+    await submitTask(data);
 
     // Log the form data
     console.log("Form submitted with data:", data);
@@ -109,7 +127,8 @@ export default function TaskingPage() {
                 Write a Problem*
               </label>
               <Textarea
-                id="problem"
+                id={FORMID.PROMPT}
+                name={FORMID.PROMPT}
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 className="min-h-[100px] w-full"
@@ -161,11 +180,29 @@ export default function TaskingPage() {
                 <Card className="bg-gray-50">
                   <CardContent className="p-4">
                     {/* TODO RESPONSE BOX */}
+                    <input
+                      id={FORMID.MODEL_RESPONSE}
+                      name={FORMID.MODEL_RESPONSE}
+                      type="hidden"
+                      value={response.response}
+                    />
+                    <input
+                      id={FORMID.MODEL_NAME}
+                      name={FORMID.MODEL_NAME}
+                      type="hidden"
+                      value={response.modelName}
+                    />
                     {response.response}
                   </CardContent>
                 </Card>
 
                 <div className="flex items-center gap-4">
+                  <input
+                    type="hidden"
+                    id={FORMID.GRADE}
+                    name={FORMID.GRADE}
+                    value={grade ?? "none"}
+                  />
                   <p className="text-sm font-medium">Was the AI correct?</p>
                   <Button
                     variant="outline"

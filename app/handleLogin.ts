@@ -1,13 +1,9 @@
 "use server";
-import { Expert } from "@prisma/client";
-import prisma from "../lib/prisma";
 import { redirect } from "next/navigation";
+import prisma from "../lib/prisma";
 
-export async function handleLogin(formData: FormData) {
+export async function doLogin({ email }: { email: string }) {
   // In a real app, you would validate the email
-  // For demo purposes, we'll just redirect to the dashboard
-  const email = formData.get("email") as string;
-
   const expert = await prisma.expert.upsert({
     create: {
       email: email,
@@ -26,11 +22,9 @@ export async function handleLogin(formData: FormData) {
     },
   });
 
-  // if (login.status === "ok") {
-  //   // Store user info in localStorage for simplicity
-  //   localStorage.setItem("login", JSON.stringify(login));
-  //
-  // }
+  console.log({ status: "ok", expert });
 
-  redirect("/dashboard");
+  return { status: "ok", expert };
+
+  // redirect("/dashboard");
 }

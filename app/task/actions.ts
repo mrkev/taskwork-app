@@ -11,8 +11,8 @@ export async function askAI(prompt: string) {
 }
 
 type TaskData = {
+  authorId: number;
   prompt: string;
-  rationale: string;
   veredict: string;
   critique?: string;
   promptImprovement?: string;
@@ -25,10 +25,9 @@ export async function submitTask(data: TaskData) {
 
   const result = await prisma.entry.create({
     data: {
-      authorId: 0, // todo
+      authorId: data.authorId, // todo: validate author
 
       prompt: data.prompt,
-      rationale: data.rationale,
       veredict: data.veredict,
       critique: data.critique,
 

@@ -1,25 +1,26 @@
-import { redirect } from "next/navigation";
+"use client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { handleLogin } from "./handleLogin";
+import { Input } from "@/components/ui/input";
+import { useRouter } from "next/navigation";
+import { doLogin } from "./handleLogin";
 
 export default function LoginPage() {
-  // async function handleLogin(formData: FormData) {
-  //   "use server";
+  const router = useRouter();
+  async function handleLogin(formData: FormData) {
+    // In a real app, you would validate the email
+    // For demo purposes, we'll just redirect to the dashboard
+    const email = formData.get("email") as string;
 
-  //   // In a real app, you would validate the email
-  //   // For demo purposes, we'll just redirect to the dashboard
-  //   const email = formData.get("email") as string;
+    const login = await doLogin({ email });
+    console.log(login);
 
-  //   const login = await doLogin({ email });
-
-  //   if (login.status === "ok") {
-  //     // Store user info in localStorage for simplicity
-  //     localStorage.setItem("login", JSON.stringify(login));
-  //     redirect("/dashboard");
-  //   }
-  // }
+    if (login.status === "ok") {
+      // Store user info in localStorage for simplicity
+      localStorage.setItem("login", JSON.stringify(login));
+      router.push("/dashboard");
+    }
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
