@@ -14,6 +14,9 @@ import { FORMID } from "./formIds";
 
 type ResponseGrade = "correct" | "unsatisfactory" | "incorrect";
 
+/** max allowed iirc */
+export const maxDuration = 60;
+
 function formString(formData: FormData, name: keyof typeof FORMID): string {
   return nullthrows(formData.get(FORMID[name]), "missing " + name) as string;
 }
