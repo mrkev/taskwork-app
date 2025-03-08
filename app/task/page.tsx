@@ -290,7 +290,7 @@ function NextStepsCorrect() {
         <div className="space-y-2">
           {/* TODO label for */}
           <h4 className="text-md font-medium text-gray-700">
-            Increase Challenge Complexity (Optional)
+            Increase Complexity (Optional)
           </h4>
           <Textarea
             id={FORMID.PROMPT_IMPROVEMENT}
