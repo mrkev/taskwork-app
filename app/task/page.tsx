@@ -28,7 +28,7 @@ function formOptString(
 
 export default function TaskingPage() {
   const router = useRouter();
-  const [prompt, setPrompt] = useState("write eulers identity in latex");
+  const [prompt, setPrompt] = useState("");
   const [showPlaintext, setShowPlaintext] = useState(false);
   const [grade, setGrade] = useState<ResponseGrade | null>(null);
   const user = useLogin();
@@ -132,6 +132,7 @@ export default function TaskingPage() {
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 className="min-h-[100px] w-full"
+                placeholder="Write a problem for the AI to solve..."
                 required
               />
             </div>

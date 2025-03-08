@@ -222,7 +222,7 @@ export function InfoCardsSection({ tasks }: { tasks: Task[] }) {
           </div>
         </CardContent>
       </Card>
-      <Card>
+      {/* <Card>
         <CardContent className="flex items-center gap-4 p-6">
           <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-green-100 text-green-500">
             <CheckCircle className="h-6 w-6" />
@@ -247,7 +247,7 @@ export function InfoCardsSection({ tasks }: { tasks: Task[] }) {
             <h3 className="text-3xl font-bold">{avgHoursPerProblem}</h3>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
   );
 }
@@ -307,18 +307,20 @@ export function TaskTable({ tasks }: { tasks: Task[] }) {
               <div className="flex space-x-2">
                 <Button
                   variant="ghost"
+                  disabled
                   className="h-8 text-blue-600 hover:text-blue-800"
                 >
                   Edit
                 </Button>
-                <Button
+                {/* <Button
                   variant="ghost"
                   className="h-8 text-green-600 hover:text-green-800"
                 >
                   Log Hours
-                </Button>
+                </Button> */}
                 <Button
                   variant="ghost"
+                  disabled
                   className="h-8 text-red-600 hover:text-red-800"
                 >
                   Delete
