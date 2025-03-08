@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { askAI, submitTask, TaskData } from "./actions";
 import { FORMID } from "./formIds";
+import { Checkbox } from "@/components/ui/checkbox";
 
 type ResponseGrade = "correct" | "unsatisfactory" | "incorrect";
 
@@ -48,11 +49,18 @@ export default function TaskingPage() {
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<ModelResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [requiresReasoning, setRequiresReasoning] = useState(false);
 
   const handleAskAI = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setGrade(null);
+
+    if (prompt.length < 1) {
+      setLoading(true);
+      setGrade(null);
+    }
+
     try {
       const response = await askAI(prompt);
       if (response == null) {
@@ -158,12 +166,29 @@ export default function TaskingPage() {
               />
             </div>
 
-            <Button
-              onClick={handleAskAI}
-              className="bg-primary hover:bg-primary/90"
-            >
-              {loading ? "Thinking..." : "Generate Response"}
-            </Button>
+            <div className="flex items-center justify-between mt-6">
+              <Button
+                onClick={handleAskAI}
+                className="bg-primary hover:bg-primary/90"
+              >
+                Generate Response
+              </Button>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="requires-reasoning"
+                  checked={requiresReasoning}
+                  onCheckedChange={(checked) =>
+                    setRequiresReasoning(checked === true)
+                  }
+                />
+                <label
+                  htmlFor="requires-reasoning"
+                  className="text-sm font-medium text-gray-700 cursor-pointer"
+                >
+                  This question requires reasoning
+                </label>
+              </div>
+            </div>
 
             {loading && (
               <div className="response-container" style={{ lineHeight: 0 }}>

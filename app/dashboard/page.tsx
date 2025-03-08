@@ -166,7 +166,6 @@ export default function DashboardPage() {
             <Button
               className="bg-blue-600 hover:bg-blue-700"
               onClick={() => {
-                console.log("HELLo");
                 router.push("/task");
               }}
             >
