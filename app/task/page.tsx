@@ -4,14 +4,13 @@ import { ModelResponse } from "@/components/ai";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { PlusCircle } from "lucide-react";
+import { UserStatus } from "@/components/useLogin";
+import { nullthrows } from "@/components/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { askAI, submitTask } from "./actions";
 import { FORMID } from "./formIds";
-import { useLogin } from "@/components/useLogin";
-import { nullthrows } from "@/components/utils";
 
 type ResponseGrade = "correct" | "unsatisfactory" | "incorrect";
 
@@ -31,7 +30,17 @@ export default function TaskingPage() {
   const [prompt, setPrompt] = useState("");
   const [showPlaintext, setShowPlaintext] = useState(false);
   const [grade, setGrade] = useState<ResponseGrade | null>(null);
-  const user = useLogin();
+
+  const [login, setLogin] = useState<UserStatus | null>(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("login");
+    if (storedUser) {
+      setLogin(JSON.parse(storedUser));
+    } else {
+      router.push("/");
+    }
+  }, [router]);
 
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<ModelResponse | null>(null);
@@ -68,9 +77,13 @@ export default function TaskingPage() {
     //   return;
     // }
 
+    if (login == null) {
+      return;
+    }
+
     const formData = new FormData(e.currentTarget);
     const data = {
-      authorId: user.expert.id,
+      authorId: login.expert.id,
       prompt: formString(formData, "PROMPT") as string,
       // response
       modelResponse: formString(formData, "MODEL_RESPONSE") as string,

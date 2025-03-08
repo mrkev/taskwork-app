@@ -17,7 +17,7 @@ export default function LoginPage() {
 
     if (login.status === "ok") {
       // Store user info in localStorage for simplicity
-      localStorage.setItem("login", JSON.stringify(login));
+      localStorage && localStorage.setItem("login", JSON.stringify(login));
       router.push("/dashboard");
     }
   }

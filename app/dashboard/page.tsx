@@ -1,14 +1,14 @@
 "use client";
-import Link from "next/link";
+import { AsyncResult, RenderAsyncResult } from "@/components/AsyncResult";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { BarChart3, CheckCircle, Clock } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useLogin } from "@/components/useLogin";
-import { useEffect, useState } from "react";
-import { AsyncResult, RenderAsyncResult } from "@/components/AsyncResult";
-import { getTasks } from "./getProblems";
+import { UserStatus } from "@/components/useLogin";
 import { Task } from "@prisma/client";
+import { BarChart3 } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { getTasks } from "./getProblems";
 
 // Mock data for problems
 const TEST_TASKS = [
@@ -45,22 +45,27 @@ const TEST_TASKS = [
 export default function DashboardPage() {
   const router = useRouter();
 
-  const totalProblems = TEST_TASKS.length;
-  const resolvedProblems = TEST_TASKS.filter(
-    (p) => p.status === "Resolved"
-  ).length;
-  const totalHours = TEST_TASKS.reduce((sum, p) => sum + p.hoursLogged, 0);
-  const avgHoursPerProblem =
-    totalProblems > 0 ? (totalHours / totalProblems).toFixed(1) : "0";
+  const [login, setLogin] = useState<UserStatus | null>(null);
 
-  const user = useLogin();
+  useEffect(() => {
+    const storedUser = localStorage.getItem("login");
+    if (storedUser) {
+      setLogin(JSON.parse(storedUser));
+    } else {
+      router.push("/");
+    }
+  }, [router]);
 
   const [tasks, setTasks] = useState<AsyncResult<Task[]>>({
     status: "pending",
   });
   useEffect(() => {
+    if (login == null) {
+      return;
+    }
+
     try {
-      getTasks({ authorId: user.expert.id }).then((tasks) => {
+      getTasks({ authorId: login.expert.id }).then((tasks) => {
         console.log(tasks);
         setTasks({
           status: "idle",
@@ -70,7 +75,7 @@ export default function DashboardPage() {
     } catch (error) {
       setTasks({ status: "error", error });
     }
-  }, []);
+  }, [login?.expert]);
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
