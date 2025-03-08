@@ -32,8 +32,13 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
       <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl text-center">Sign In</CardTitle>
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-serif text-center">
+            Sign In
+          </CardTitle>
+          {/* <CardDescription className="text-center">
+            Enter your institutional email to continue
+          </CardDescription> */}
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
