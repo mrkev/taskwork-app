@@ -23,7 +23,7 @@ type TaskData = {
 export async function submitTask(data: TaskData) {
   console.log("Submitting task data:", data);
 
-  const result = await prisma.entry.create({
+  const result = await prisma.task.create({
     data: {
       authorId: data.authorId, // todo: validate author
 

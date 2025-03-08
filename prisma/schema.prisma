@@ -17,10 +17,10 @@ model Expert {
   lastName    String
   institution String
 
-  entries Entry[]
+  entries Task[]
 }
 
-model Entry {
+model Task {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
